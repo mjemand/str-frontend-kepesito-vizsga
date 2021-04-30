@@ -1,4 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { Movie } from '../model/movie';
 
 @Component({
@@ -8,15 +10,25 @@ import { Movie } from '../model/movie';
 })
 export class MovieListComponent implements OnInit {
 
-  movies: Movie[] = [];
+  BASE_URL = 'https://tr360-frontend-exam-april.azurewebsites.net/mjemand/movies';
 
-  constructor() { }
+  movieList: BehaviorSubject<Movie[]> = new BehaviorSubject<Movie[]>([])
+
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
   }
 
-  getMovies(): void {}
+  getMovieList(): void {
+    this.http.get<Movie[]>(`${this.BASE_URL}`).subscribe(
+      list => this.movieList.next(list)
+    );
+  }
 
-  deleteMovie(id: number): any {}
+  deleteMovie(movie: Movie): void {
+    this.http.delete<Movie>(`${this.BASE_URL}/${movie.id}`).subscribe(
+      () => this.getMovieList()
+    )
+  }
 
 }
